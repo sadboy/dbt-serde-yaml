@@ -100,7 +100,13 @@ impl Default for Span {
 
 impl Debug for Span {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:?}..{:?}", self.start, self.end)
+        write!(f, "{:?}..{:?}", self.start, self.end)?;
+        #[cfg(feature = "filename")]
+        if let Some(filename) = &self.filename {
+            write!(f, "[{}]", filename.display())
+        } else {
+            Ok(())
+        }
     }
 }
 
