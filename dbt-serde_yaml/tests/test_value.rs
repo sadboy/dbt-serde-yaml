@@ -1066,4 +1066,44 @@ fn test_untagged_enum_flatten_dunder() {
     assert_eq!(list[1], Untagged::Unit);
     assert_eq!(list[2], Untagged::Number(101, 102));
     assert_eq!(list[3], Untagged::String("hello".to_string()));
+
+    #[derive(Deserialize, PartialEq, Eq, Debug)]
+    struct Thing3 {
+        key: String,
+        __rest__: Verbatim<HashMap<String, Value>>,
+    }
+
+    let yaml = indoc! {"
+        key: value
+        a:
+         - c
+         - y
+    "};
+    let value = dbt_serde_yaml::from_str::<Value>(yaml).unwrap();
+    let (thing3, unused_keys) = deserialize_value::<Untagged<Thing3>>(value, |_| Ok(None));
+    assert!(unused_keys.is_empty());
+    // assert_eq!(
+    //     thing3,
+    //     Untagged::Thing(Thing3 {
+    //         key: "value".to_string(),
+    //         __rest__: HashMap::from([
+    //             ("a".to_string(), 3.into()),
+    //             ("c".to_string(), false.into()),
+    //             ("y".to_string(), "5".into()),
+    //         ]),
+    //     })
+    // );
+    let thing3: Thing3 = match thing3 {
+        Untagged::Thing(t) => t,
+        _ => panic!("expected Thing3"),
+    };
+    assert!(thing3.__rest__.get("a").unwrap().span().is_valid());
+    assert_eq!(
+        thing3.__rest__,
+        HashMap::from([(
+            "a".to_string(),
+            Value::sequence(vec![Value::string("c".to_string()), Value::string("y".to_string())])
+        ),])
+        .into()
+    );
 }

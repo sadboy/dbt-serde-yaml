@@ -6,13 +6,12 @@ impl Debug for Value {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         // TODO: print the span as well
         match self {
-            Value::Null(..) => formatter.write_str("Null"),
-            Value::Bool(boolean, ..) => write!(formatter, "Bool({})", boolean),
-            Value::Number(number, ..) => write!(formatter, "Number({})", number),
-            Value::String(string, ..) => write!(formatter, "String({:?})", string),
-            Value::Sequence(sequence, ..) => {
-                formatter.write_str("Sequence ")?;
-                formatter.debug_list().entries(sequence).finish()
+            Value::Null(span) => write!(formatter, "Null({:?})", span),
+            Value::Bool(boolean, span) => write!(formatter, "Bool({:?}, {:?})", boolean, span),
+            Value::Number(number, span) => write!(formatter, "Number({:?}, {:?})", number, span),
+            Value::String(string, span) => write!(formatter, "String({:?}, {:?})", string, span),
+            Value::Sequence(sequence, span) => {
+                write!(formatter, "Sequence({:?}, {:?})", sequence, span)
             }
             Value::Mapping(mapping, ..) => Debug::fmt(mapping, formatter),
             Value::Tagged(tagged, ..) => Debug::fmt(tagged, formatter),
