@@ -829,6 +829,7 @@ fn test_schemars() {
         x: Option<Option<i32>>,
         y: Verbatim<Value, String>,
         z: Verbatim<Option<Value>>,
+        w: HashMap<String, Value>,
         v: Verbatim<Option<Option<String>>>,
     }
 
@@ -842,12 +843,16 @@ $schema: http://json-schema.org/draft-07/schema#
 title: Thing
 type: object
 required:
+- w
 - y
 properties:
   v:
     type:
     - string
     - 'null'
+  w:
+    type: object
+    additionalProperties: true
   x:
     type:
     - integer
@@ -855,12 +860,7 @@ properties:
     format: int32
   y:
     type: string
-  z:
-    anyOf:
-    - $ref: '#/definitions/AnyValue'
-    - type: 'null'
-definitions:
-  AnyValue: true
+  z: true
 "}
     );
 }

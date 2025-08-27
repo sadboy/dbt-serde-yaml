@@ -848,9 +848,18 @@ impl IntoDeserializer<'_, Error> for Value {
 }
 
 #[cfg(feature = "schemars")]
+// Copied from the impl for [serde_json::Value]:
 impl schemars::JsonSchema for Value {
+    fn is_referenceable() -> bool {
+        false
+    }
+
     fn schema_name() -> String {
         "AnyValue".into()
+    }
+
+    fn schema_id() -> std::borrow::Cow<'static, str> {
+        std::borrow::Cow::Borrowed("AnyValue")
     }
 
     fn json_schema(_: &mut schemars::SchemaGenerator) -> schemars::schema::Schema {
